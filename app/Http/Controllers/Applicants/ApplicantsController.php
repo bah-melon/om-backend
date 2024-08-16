@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\createApplicationRequest;
 use App\Models\Applicants;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ApplicantsController extends Controller
 {
@@ -19,8 +20,9 @@ class ApplicantsController extends Controller
 
     public function fetchApplications(){
         return(Applicants::query()
+                        ->with('openPosition')
                         ->orderBy('created_at', 'desc')
-                        ->paginate(20));
+                        ->paginate(8));
     }
 
     /**
@@ -37,17 +39,9 @@ class ApplicantsController extends Controller
     public function store(createApplicationRequest $request)
     {
         $data = $request->validated();
-        // $data = $request->validate([
-        //     'firstName' => ['required', 'string'],
-        //     'lastName' => ['required', 'string'],
-        //     'phoneNumber' => ['required', 'string'],
-        //     'email' => ['required', 'string'],
-        //     'city' => ['required', 'string'],
-        //     'country' => ['required', 'string'],
-        //     'file_path' => ['required', 'string'],
-        //     'description' => ['required', 'string'],
-        //     'open-positions' => ['required', 'string']
-        // ]);
+
+        $data['file_path'] = $request->file('file_path')->store('application_CVs', 'local');
+        
         $application = Applicants::create($data);
 
         return response()->json([
@@ -65,6 +59,18 @@ class ApplicantsController extends Controller
             'application' => $applicant
         ], 201);
     }
+
+    public function downloadCV(Applicants $applicant)
+    {
+        $file_path = $applicant->file_path;
+        
+        if(Storage::disk('local')->exists($file_path)){
+            return Storage::disk('local')->download($file_path, $applicant->file_name ?? 'CV.pdf');
+        } else {
+            return response()->json(['message' => 'File not found'], 404);
+        }
+    }
+
 
     /**
      * Show the form for editing the specified resource.

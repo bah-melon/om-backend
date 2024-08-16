@@ -11,10 +11,11 @@ Route::prefix('auth')->group(function () {
     Route::post('login', [AuthController::class, 'credentialsLogin']);
     Route::get('reset-password', [AuthController::class, 'resetPassword']);
     Route::post('reset-password', [AuthController::class, 'updatePassword']);
-
     // Authentication routes that require previously issued access token
     Route::middleware(['auth:api'])->group(function () {
         Route::post('logout', [AuthController::class, 'logout']);
+        Route::patch('update-user', [AuthController::class, 'updateUser']);
+        Route::patch('change-password', [AuthController::class, 'changePassword']);
     });
 });
 
@@ -33,9 +34,12 @@ Route::group(['middleware' => 'auth:api'], function () {
     });
     Route::prefix('applications')->group(function(){
         Route::get('/', [ApplicantsController::class, 'fetchApplications']);
-        Route::post('/create', [ApplicantsController::class, 'store']);
         Route::get('/show/{applicant}', [ApplicantsController::class, 'show']);
+        Route::get('/{applicant}/download', [ApplicantsController::class, 'downloadCV']);
         Route::delete('/{applicant}', [ApplicantsController::class, 'destroy']);
     });
 
 });
+
+Route::post('applications/create', [ApplicantsController::class, 'store']);
+

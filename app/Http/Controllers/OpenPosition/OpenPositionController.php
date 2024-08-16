@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\OpenPosition;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\OpenPositionRequest\storeOpenPositionRequest;
+use App\Http\Requests\OpenPositionRequest\updateOpenPositionRequest;
 use App\Models\OpenPosition;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -21,7 +23,7 @@ class OpenPositionController extends Controller
         return (OpenPosition::query()
                             ->with(["applicants"])
                             ->orderBy('created_at', 'desc')
-                            ->paginate(4));
+                            ->paginate(5));
     }
 
     public function fetchApplicantsForPosition(OpenPosition $openPosition){
@@ -43,14 +45,9 @@ class OpenPositionController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(storeOpenPositionRequest $request)
     {
-        $data = $request->validate([
-            'title' => ['required', 'string'],
-            'location' => ['required', 'string'],
-            'description' => ['required', 'string'],
-            'employment_type' => ['required', 'in:Fulltime,Part time'],
-        ]);
+        $data = $request->validated();
 
         $data['user_id'] = $request->user()->id;
 
@@ -89,21 +86,9 @@ class OpenPositionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, OpenPosition $openPosition)
+    public function update(updateOpenPositionRequest $request, OpenPosition $openPosition)
     {
-        // if ($openPosition->user_id != request()->user()->id) {
-        //     return response()->json([
-        //         'message' => 'Unauthorized'
-        //     ], 403);
-        // }
-
-        $data = $request->validate([
-            'title' => ['required', 'string'],
-            'location' => ['required', 'string'],
-            'description' => ['required', 'string'],
-            'employment_type' => ['required', 'string']
-        ]);
-
+        $data = $request->validated();
 
         $isUpdated = $openPosition->update($data);
         return response()->json([

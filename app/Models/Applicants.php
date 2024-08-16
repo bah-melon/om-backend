@@ -25,4 +25,8 @@ class Applicants extends Model
     public function getFileUrl(){
         return $this->file_path ? Storage::url($this->file_path) : null;
     }
+
+    public function openPosition(){
+        return $this->belongsTo(OpenPosition::class, 'open_positions');
+    }
 }

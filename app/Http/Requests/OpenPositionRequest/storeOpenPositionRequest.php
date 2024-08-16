@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\OpenPositionRequest;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class createApplicationRequest extends FormRequest
+class storeOpenPositionRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,15 +22,10 @@ class createApplicationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'firstName' => ['required', 'string'],
-            'lastName' => ['required', 'string'],
-            'phoneNumber' => ['required', 'string'],
-            'email' => ['required', 'string', 'email'],
-            'city' => ['required', 'string'],
-            'country' => ['required', 'string'],
-            'file_path' => ['required', 'file', 'mimes:pdf', 'max:2048'],
+            'title' => ['required', 'string'],
+            'location' => ['required', 'string'],
             'description' => ['required', 'string'],
-            'open_positions' => ['required']
+            'employment_type' => ['required', 'in:Fulltime,Part time'],
         ];
     }
 }
